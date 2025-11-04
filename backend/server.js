@@ -48,16 +48,15 @@ app.use(cors(corsOptions));
 
 // Explicitly handle OPTIONS requests
 app.options('*', cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware (development)
-if (process.env.NODE_ENV !== "production") {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path} - Body:`, req.body);
-    next();
-  });
-}
+// Request logging middleware (all environments for debugging)
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin || 'none'}`);
+  next();
+});
 
 // API Routes
 app.use("/api/auth", authRoutes);
