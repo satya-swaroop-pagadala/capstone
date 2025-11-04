@@ -1,0 +1,21 @@
+{
+  "name": "kosg-entertainment-platform",
+  "version": "1.0.0",
+  "description": "KOSG - Personalized Entertainment Discovery Platform with MongoDB and React",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../project && npm install",
+    "seed": "cd backend && npm run seed",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd project && npm run dev",
+    "start:backend": "cd backend && npm start",
+    "build:frontend": "cd project && npm run build"
+  },
+  "keywords": ["entertainment", "movies", "music", "mongodb", "react", "express"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "mongoose": "^8.19.2"
+  }
+}

@@ -1,0 +1,164 @@
+[
+  {
+    "title": "Blinding Lights",
+    "artist": "The Weeknd",
+    "genre": ["Pop", "Dance"],
+    "mood": ["Energetic", "Happy", "Party"],
+    "album": "After Hours",
+    "coverUrl": "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "3:20"
+  },
+  {
+    "title": "Bohemian Rhapsody",
+    "artist": "Queen",
+    "genre": ["Rock"],
+    "mood": ["Energetic", "Melancholic"],
+    "album": "A Night at the Opera",
+    "coverUrl": "https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "5:55"
+  },
+  {
+    "title": "Shape of You",
+    "artist": "Ed Sheeran",
+    "genre": ["Pop", "Dance"],
+    "mood": ["Happy", "Party", "Energetic"],
+    "album": "Divide",
+    "coverUrl": "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "3:53"
+  },
+  {
+    "title": "Smells Like Teen Spirit",
+    "artist": "Nirvana",
+    "genre": ["Rock", "Alternative"],
+    "mood": ["Energetic", "Melancholic"],
+    "album": "Nevermind",
+    "coverUrl": "https://images.pexels.com/photos/1032653/pexels-photo-1032653.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "5:01"
+  },
+  {
+    "title": "Billie Jean",
+    "artist": "Michael Jackson",
+    "genre": ["Pop", "R&B"],
+    "mood": ["Party", "Energetic", "Happy"],
+    "album": "Thriller",
+    "coverUrl": "https://images.pexels.com/photos/2102568/pexels-photo-2102568.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "4:54"
+  },
+  {
+    "title": "Hotel California",
+    "artist": "Eagles",
+    "genre": ["Rock"],
+    "mood": ["Chill", "Melancholic"],
+    "album": "Hotel California",
+    "coverUrl": "https://images.pexels.com/photos/164821/pexels-photo-164821.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "6:30"
+  },
+  {
+    "title": "Levitating",
+    "artist": "Dua Lipa",
+    "genre": ["Pop", "Dance"],
+    "mood": ["Happy", "Party", "Energetic"],
+    "album": "Future Nostalgia",
+    "coverUrl": "https://images.pexels.com/photos/1389429/pexels-photo-1389429.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "3:23"
+  },
+  {
+    "title": "Stairway to Heaven",
+    "artist": "Led Zeppelin",
+    "genre": ["Rock"],
+    "mood": ["Chill", "Melancholic"],
+    "album": "Led Zeppelin IV",
+    "coverUrl": "https://images.pexels.com/photos/1314410/pexels-photo-1314410.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "8:02"
+  },
+  {
+    "title": "Watermelon Sugar",
+    "artist": "Harry Styles",
+    "genre": ["Pop"],
+    "mood": ["Happy", "Chill"],
+    "album": "Fine Line",
+    "coverUrl": "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "2:54"
+  },
+  {
+    "title": "Lose Yourself",
+    "artist": "Eminem",
+    "genre": ["Hip-Hop"],
+    "mood": ["Energetic", "Focused"],
+    "album": "8 Mile Soundtrack",
+    "coverUrl": "https://images.pexels.com/photos/114820/pexels-photo-114820.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "5:26"
+  },
+  {
+    "title": "Someone Like You",
+    "artist": "Adele",
+    "genre": ["Pop", "R&B"],
+    "mood": ["Melancholic", "Chill"],
+    "album": "21",
+    "coverUrl": "https://images.pexels.com/photos/247791/pexels-photo-247791.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "4:45"
+  },
+  {
+    "title": "Uptown Funk",
+    "artist": "Mark Ronson ft. Bruno Mars",
+    "genre": ["Pop", "Electronic"],
+    "mood": ["Party", "Happy", "Energetic"],
+    "album": "Uptown Special",
+    "coverUrl": "https://images.pexels.com/photos/1644888/pexels-photo-1644888.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "4:30"
+  },
+  {
+    "title": "Clair de Lune",
+    "artist": "Claude Debussy",
+    "genre": ["Classical"],
+    "mood": ["Chill", "Focused"],
+    "album": "Suite Bergamasque",
+    "coverUrl": "https://images.pexels.com/photos/1246437/pexels-photo-1246437.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "5:00"
+  },
+  {
+    "title": "Take Five",
+    "artist": "Dave Brubeck",
+    "genre": ["Jazz"],
+    "mood": ["Chill", "Focused"],
+    "album": "Time Out",
+    "coverUrl": "https://images.pexels.com/photos/164821/pexels-photo-164821.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "5:24"
+  },
+  {
+    "title": "Titanium",
+    "artist": "David Guetta ft. Sia",
+    "genre": ["Electronic", "Pop"],
+    "mood": ["Energetic", "Party"],
+    "album": "Nothing but the Beat",
+    "coverUrl": "https://images.pexels.com/photos/1047442/pexels-photo-1047442.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "4:05"
+  },
+  {
+    "title": "Wonderwall",
+    "artist": "Oasis",
+    "genre": ["Alternative", "Rock"],
+    "mood": ["Chill", "Happy"],
+    "album": "(What's the Story) Morning Glory?",
+    "coverUrl": "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "4:18"
+  },
+  {
+    "title": "Bad Guy",
+    "artist": "Billie Eilish",
+    "genre": ["Pop", "Electronic"],
+    "mood": ["Energetic", "Party"],
+    "album": "When We All Fall Asleep",
+    "coverUrl": "https://images.pexels.com/photos/1525589/pexels-photo-1525589.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "3:14"
+  },
+  {
+    "title": "Rolling in the Deep",
+    "artist": "Adele",
+    "genre": ["Pop", "R&B"],
+    "mood": ["Energetic", "Melancholic"],
+    "album": "21",
+    "coverUrl": "https://images.pexels.com/photos/3944091/pexels-photo-3944091.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "duration": "3:48"
+  }
+]

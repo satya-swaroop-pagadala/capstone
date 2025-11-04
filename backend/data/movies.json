@@ -1,0 +1,146 @@
+[
+  {
+    "title": "The Shawshank Redemption",
+    "genre": ["Drama", "Crime"],
+    "mood": ["Sad", "Happy"],
+    "overview": "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+    "releaseYear": 1994,
+    "posterUrl": "https://images.pexels.com/photos/7991158/pexels-photo-7991158.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 9.3
+  },
+  {
+    "title": "Inception",
+    "genre": ["Sci-Fi", "Thriller", "Action"],
+    "mood": ["Excited", "Adventurous"],
+    "overview": "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea.",
+    "releaseYear": 2010,
+    "posterUrl": "https://images.pexels.com/photos/7991211/pexels-photo-7991211.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.8
+  },
+  {
+    "title": "The Dark Knight",
+    "genre": ["Action", "Crime", "Drama"],
+    "mood": ["Excited", "Adventurous"],
+    "overview": "When the menace known as the Joker wreaks havoc on Gotham, Batman must accept one of the greatest tests.",
+    "releaseYear": 2008,
+    "posterUrl": "https://images.pexels.com/photos/436413/pexels-photo-436413.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 9.0
+  },
+  {
+    "title": "Pulp Fiction",
+    "genre": ["Crime", "Drama"],
+    "mood": ["Excited", "Sad"],
+    "overview": "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption.",
+    "releaseYear": 1994,
+    "posterUrl": "https://images.pexels.com/photos/1200450/pexels-photo-1200450.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.9
+  },
+  {
+    "title": "Forrest Gump",
+    "genre": ["Drama", "Romance"],
+    "mood": ["Happy", "Romantic", "Sad"],
+    "overview": "The presidencies of Kennedy and Johnson unfold through the perspective of an Alabama man with an IQ of 75.",
+    "releaseYear": 1994,
+    "posterUrl": "https://images.pexels.com/photos/66134/pexels-photo-66134.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.8
+  },
+  {
+    "title": "Interstellar",
+    "genre": ["Sci-Fi", "Drama", "Adventure"],
+    "mood": ["Adventurous", "Sad"],
+    "overview": "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+    "releaseYear": 2014,
+    "posterUrl": "https://images.pexels.com/photos/2150/sky-space-dark-galaxy.jpg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.6
+  },
+  {
+    "title": "The Matrix",
+    "genre": ["Sci-Fi", "Action"],
+    "mood": ["Excited", "Adventurous"],
+    "overview": "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
+    "releaseYear": 1999,
+    "posterUrl": "https://images.pexels.com/photos/1164674/pexels-photo-1164674.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.7
+  },
+  {
+    "title": "Goodfellas",
+    "genre": ["Crime", "Drama"],
+    "mood": ["Excited"],
+    "overview": "The story of Henry Hill and his life in the mob, covering his relationship with his wife Karen Hill and his mob partners.",
+    "releaseYear": 1990,
+    "posterUrl": "https://images.pexels.com/photos/3137078/pexels-photo-3137078.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.7
+  },
+  {
+    "title": "The Lord of the Rings: The Return of the King",
+    "genre": ["Adventure", "Drama", "Action"],
+    "mood": ["Adventurous", "Excited"],
+    "overview": "Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo and Sam.",
+    "releaseYear": 2003,
+    "posterUrl": "https://images.pexels.com/photos/1374295/pexels-photo-1374295.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.9
+  },
+  {
+    "title": "Fight Club",
+    "genre": ["Drama"],
+    "mood": ["Excited", "Sad"],
+    "overview": "An insomniac office worker and a devil-may-care soap maker form an underground fight club.",
+    "releaseYear": 1999,
+    "posterUrl": "https://images.pexels.com/photos/3931177/pexels-photo-3931177.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.8
+  },
+  {
+    "title": "Star Wars: Episode V",
+    "genre": ["Sci-Fi", "Action", "Adventure"],
+    "mood": ["Adventurous", "Excited"],
+    "overview": "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training.",
+    "releaseYear": 1980,
+    "posterUrl": "https://images.pexels.com/photos/1446076/pexels-photo-1446076.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.7
+  },
+  {
+    "title": "The Silence of the Lambs",
+    "genre": ["Thriller", "Crime"],
+    "mood": ["Excited"],
+    "overview": "A young FBI cadet must receive the help of an incarcerated and manipulative cannibal killer.",
+    "releaseYear": 1991,
+    "posterUrl": "https://images.pexels.com/photos/6603448/pexels-photo-6603448.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.6
+  },
+  {
+    "title": "Schindler's List",
+    "genre": ["Drama"],
+    "mood": ["Sad"],
+    "overview": "In German-occupied Poland, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce.",
+    "releaseYear": 1993,
+    "posterUrl": "https://images.pexels.com/photos/62307/pexels-photo-62307.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.9
+  },
+  {
+    "title": "Parasite",
+    "genre": ["Drama", "Thriller"],
+    "mood": ["Excited", "Sad"],
+    "overview": "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+    "releaseYear": 2019,
+    "posterUrl": "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.6
+  },
+  {
+    "title": "La La Land",
+    "genre": ["Romance", "Drama", "Comedy"],
+    "mood": ["Happy", "Romantic"],
+    "overview": "While navigating their careers in Los Angeles, a pianist and an actress fall in love while attempting to reconcile their aspirations.",
+    "releaseYear": 2016,
+    "posterUrl": "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.0
+  },
+  {
+    "title": "Toy Story",
+    "genre": ["Comedy", "Adventure"],
+    "mood": ["Happy", "Relaxed"],
+    "overview": "A cowboy doll is profoundly threatened when a new spaceman figure supplants him as top toy in a boy's room.",
+    "releaseYear": 1995,
+    "posterUrl": "https://images.pexels.com/photos/163036/mario-luigi-yoschi-figures-163036.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 8.3
+  }
+]
