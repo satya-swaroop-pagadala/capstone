@@ -17,12 +17,8 @@ connectDB();
 const app = express();
 
 // CORS Configuration - Allow frontend to connect
-const corsOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',')
-  : ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'];
-
 const corsOptions = {
-  origin: corsOrigins,
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
   credentials: true,
   optionsSuccessStatus: 200
 };

@@ -3,15 +3,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies (only production dependencies in final image)
 COPY package*.json ./
 RUN npm install --production
 
-# Copy source code
+# Copy source
 COPY . .
 
 ENV NODE_ENV=production
-EXPOSE 5001
+EXPOSE 5000
 
-# Wait for MongoDB to be ready, then start server
 CMD ["node", "server.js"]
