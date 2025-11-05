@@ -1,0 +1,24 @@
+# Ignore large dataset files in frontend builds
+backend/data/*.csv
+backend/data/*_real.json
+backend/data/music_dataset.csv
+backend/data/movies.csv
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
