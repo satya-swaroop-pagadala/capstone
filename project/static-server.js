@@ -25,6 +25,13 @@ const mimeTypes = {
 const server = http.createServer((req, res) => {
   console.log(`${req.method} ${req.url}`);
   
+  // Health check endpoint for Railway
+  if (req.url === '/health' || req.url === '/api/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'OK', timestamp: new Date().toISOString() }));
+    return;
+  }
+  
   // Remove query string and decode URI
   let filePath = req.url.split('?')[0];
   filePath = decodeURIComponent(filePath);
@@ -44,6 +51,7 @@ const server = http.createServer((req, res) => {
         // File not found, serve index.html for SPA routing
         fs.readFile(path.join(DIST_DIR, 'index.html'), (err, content) => {
           if (err) {
+            console.error('Error loading index.html:', err);
             res.writeHead(500);
             res.end('Error loading index.html');
           } else {
@@ -52,6 +60,7 @@ const server = http.createServer((req, res) => {
           }
         });
       } else {
+        console.error('Server error:', err);
         res.writeHead(500);
         res.end(`Server Error: ${err.code}`);
       }
@@ -62,7 +71,21 @@ const server = http.createServer((req, res) => {
   });
 });
 
+// Check if dist directory exists
+if (!fs.existsSync(DIST_DIR)) {
+  console.error(`❌ ERROR: dist directory not found at ${DIST_DIR}`);
+  process.exit(1);
+}
+
+// Check if index.html exists
+const indexPath = path.join(DIST_DIR, 'index.html');
+if (!fs.existsSync(indexPath)) {
+  console.error(`❌ ERROR: index.html not found at ${indexPath}`);
+  process.exit(1);
+}
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
   console.log(`📁 Serving files from: ${DIST_DIR}`);
+  console.log(`🚀 App is ready to accept requests`);
 });
