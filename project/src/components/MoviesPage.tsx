@@ -197,7 +197,7 @@ export default function MoviesPage() {
     try {
       if (isCurrentlyFavorite) {
         // Remove from favorites
-        await removeFavoriteByItem(id, 'Movie', user._id);
+        await removeFavoriteByItem(id, 'Movie');
         
         // Track as view instead of like
         await trackInteraction({
@@ -208,7 +208,7 @@ export default function MoviesPage() {
         });
       } else {
         // Add to favorites
-        await addFavorite(id, 'Movie', user._id);
+        await addFavorite(id, 'Movie');
         
         // Track as like
         await trackInteraction({

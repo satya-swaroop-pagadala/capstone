@@ -230,11 +230,10 @@ export const getFavorites = async (userId: string = "guest"): Promise<Favorite[]
 
 export const addFavorite = async (
   itemId: string,
-  itemType: "Movie" | "Music",
-  userId: string = "guest"
+  itemType: "Movie" | "Music"
 ): Promise<Favorite> => {
   try {
-    const response = await api.post("/api/favorites", { itemId, itemType, userId });
+    const response = await api.post("/api/favorites", { itemId, itemType });
     return response.data;
   } catch (error) {
     console.error("Error adding favorite:", error);
@@ -253,12 +252,11 @@ export const removeFavorite = async (id: string): Promise<void> => {
 
 export const removeFavoriteByItem = async (
   itemId: string,
-  itemType: "Movie" | "Music",
-  userId: string = "guest"
+  itemType: "Movie" | "Music"
 ): Promise<void> => {
   try {
     await api.delete(`/api/favorites/item/${itemId}`, {
-      params: { itemType, userId },
+      params: { itemType },
     });
   } catch (error) {
     console.error("Error removing favorite by item:", error);

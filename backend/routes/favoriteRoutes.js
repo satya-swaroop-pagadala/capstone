@@ -9,9 +9,9 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Allow both authenticated and guest access for favorites
-router.route("/").get(getFavorites).post(addFavorite);
-router.route("/:id").delete(removeFavorite);
-router.route("/item/:itemId").delete(removeFavoriteByItem);
+// Protected routes - require authentication
+router.route("/").get(protect, getFavorites).post(protect, addFavorite);
+router.route("/:id").delete(protect, removeFavorite);
+router.route("/item/:itemId").delete(protect, removeFavoriteByItem);
 
 export default router;
