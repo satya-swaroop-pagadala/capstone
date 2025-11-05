@@ -6,6 +6,7 @@ import movieRoutes from "./routes/movieRoutes.js";
 import musicRoutes from "./routes/musicRoutes.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import recommendationRoutes from "./routes/recommendationRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -68,6 +69,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/music", musicRoutes);
 app.use("/api/favorites", favoriteRoutes);
+app.use("/api/recommendations", recommendationRoutes);
 
 // Health check route
 app.get("/api/health", (req, res) => {
