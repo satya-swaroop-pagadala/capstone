@@ -1,0 +1,13 @@
+[
+  {
+    "name": "easygoing-serenity",
+    "build": {
+      "builder": "DOCKERFILE",
+      "dockerfilePath": "project/Dockerfile"
+    },
+    "deploy": {
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10
+    }
+  }
+]
