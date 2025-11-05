@@ -175,12 +175,13 @@ export default function MoviesPage() {
     }
   };
 
-  const toggleFavorite = async (id: string) => {
+  const toggleFavorite = async (movie: APIMovie) => {
     if (!user) {
       console.error('User must be logged in to favorite movies');
       return;
     }
 
+    const id = movie._id;
     const isCurrentlyFavorite = favorites.has(id);
     
     // Optimistically update UI
@@ -197,7 +198,9 @@ export default function MoviesPage() {
     try {
       if (isCurrentlyFavorite) {
         // Remove from favorites
+        console.log('Removing favorite:', { id, itemType: 'Movie' });
         await removeFavoriteByItem(id, 'Movie');
+        console.log('Successfully removed favorite');
         
         // Track as view instead of like
         await trackInteraction({
@@ -207,8 +210,21 @@ export default function MoviesPage() {
           mood: selectedMood || undefined
         });
       } else {
-        // Add to favorites
-        await addFavorite(id, 'Movie');
+        // Add to favorites with complete movie data
+        console.log('Adding favorite:', { 
+          id, 
+          itemType: 'Movie', 
+          userId: user._id,
+          title: movie.title,
+          posterPath: movie.posterUrl
+        });
+        const result = await addFavorite(id, 'Movie', {
+          title: movie.title,
+          posterPath: movie.posterUrl,
+          rating: movie.rating,
+          releaseDate: movie.releaseYear?.toString()
+        });
+        console.log('Successfully added favorite:', result);
         
         // Track as like
         await trackInteraction({
@@ -227,8 +243,16 @@ export default function MoviesPage() {
           await fetchCFRecommendations();
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling favorite:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      // Show user-friendly error message
+      alert(`Failed to ${isCurrentlyFavorite ? 'remove' : 'add'} favorite: ${error.response?.data?.message || error.message}`);
       
       // Revert optimistic update on error
       setFavorites(prev => {
@@ -459,7 +483,7 @@ export default function MoviesPage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                       <button
-                        onClick={() => toggleFavorite(movie._id)}
+                        onClick={() => toggleFavorite(movie)}
                         className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                       >
                         <Heart
@@ -561,7 +585,7 @@ export default function MoviesPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <button
-                    onClick={() => toggleFavorite(movie._id)}
+                    onClick={() => toggleFavorite(movie)}
                     className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                     aria-label={favorites.has(movie._id) ? 'Remove from favorites' : 'Add to favorites'}
                   >
@@ -621,7 +645,7 @@ export default function MoviesPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <button
-                    onClick={() => toggleFavorite(movie._id)}
+                    onClick={() => toggleFavorite(movie)}
                     className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                     aria-label={favorites.has(movie._id) ? 'Remove from favorites' : 'Add to favorites'}
                   >

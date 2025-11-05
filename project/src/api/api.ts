@@ -230,10 +230,24 @@ export const getFavorites = async (userId: string = "guest"): Promise<Favorite[]
 
 export const addFavorite = async (
   itemId: string,
-  itemType: "Movie" | "Music"
+  itemType: "Movie" | "Music",
+  additionalData?: {
+    title?: string;
+    posterPath?: string;
+    rating?: number;
+    releaseDate?: string;
+    artist?: string;
+  }
 ): Promise<Favorite> => {
   try {
-    const response = await api.post("/api/favorites", { itemId, itemType });
+    const payload = {
+      itemId,
+      itemType,
+      ...additionalData
+    };
+    console.log('addFavorite API call with payload:', payload);
+    const response = await api.post("/api/favorites", payload);
+    console.log('addFavorite API response:', response.data);
     return response.data;
   } catch (error) {
     console.error("Error adding favorite:", error);
