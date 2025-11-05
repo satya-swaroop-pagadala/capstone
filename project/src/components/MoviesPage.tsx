@@ -36,6 +36,7 @@ export default function MoviesPage() {
   const [selectedGenre, setSelectedGenre] = useState<string>('');
   const [showTrending, setShowTrending] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [totalMovies, setTotalMovies] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,9 +54,11 @@ export default function MoviesPage() {
       if (!user) {
         setFavorites(new Set());
         setLikedMovies([]);
+        setFavoritesLoading(false);
         return;
       }
       
+      setFavoritesLoading(true);
       try {
         console.log('Loading favorites for user:', user._id);
         const userFavorites = await getFavorites();
@@ -76,6 +79,8 @@ export default function MoviesPage() {
         }
       } catch (error) {
         console.error('Error loading favorites:', error);
+      } finally {
+        setFavoritesLoading(false);
       }
     };
     
@@ -191,6 +196,12 @@ export default function MoviesPage() {
   const toggleFavorite = async (movie: APIMovie) => {
     if (!user) {
       console.error('User must be logged in to favorite movies');
+      return;
+    }
+
+    // Prevent action while favorites are still loading
+    if (favoritesLoading) {
+      console.log('Favorites still loading, please wait...');
       return;
     }
 
