@@ -8,7 +8,13 @@ import Music from "../models/musicModel.js";
 const getFavorites = async (req, res) => {
   try {
     const userId = req.user._id;
+    console.log('🔍 getFavorites - userId:', userId);
+    console.log('🔍 getFavorites - user email:', req.user.email);
+    
     const favorites = await Favorite.find({ userId });
+    console.log('🔍 getFavorites - found favorites:', favorites.length);
+    console.log('🔍 getFavorites - favorite userIds:', favorites.map(f => f.userId.toString()));
+    
     res.json({ favorites });
   } catch (error) {
     console.error('Error fetching favorites:', error);
