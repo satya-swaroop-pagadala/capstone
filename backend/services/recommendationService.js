@@ -1,6 +1,7 @@
 import UserInteraction from "../models/userInteractionModel.js";
 import Movie from "../models/movieModel.js";
 import Music from "../models/musicModel.js";
+import collaborativeFilteringService from "./collaborativeFilteringService.js";
 
 /**
  * Hybrid Recommendation System
@@ -244,67 +245,17 @@ class RecommendationEngine {
 
   /**
    * Collaborative Filtering for Movies
-   * Recommends movies liked by similar users
+   * Uses improved cosine similarity algorithm
    */
   async getCollaborativeMovies(userId, limit = 20) {
     try {
-      // Find users with similar taste
-      const userLikes = await UserInteraction.find({
-        user: userId,
-        itemType: "movie",
-        interactionType: { $in: ["like", "favorite"] },
-      }).select("itemId");
+      const result = await collaborativeFilteringService.getCollaborativeMovieRecommendations(
+        userId,
+        { k: 30, limit: limit * 2, minOverlap: 2 }
+      );
 
-      if (userLikes.length === 0) {
-        return [];
-      }
-
-      const likedItemIds = userLikes.map((like) => like.itemId);
-
-      // Find other users who liked the same movies
-      const similarUsers = await UserInteraction.find({
-        itemId: { $in: likedItemIds },
-        user: { $ne: userId },
-        itemType: "movie",
-        interactionType: { $in: ["like", "favorite"] },
-      })
-        .distinct("user")
-        .limit(50);
-
-      // Get movies liked by similar users
-      const recommendations = await UserInteraction.find({
-        user: { $in: similarUsers },
-        itemType: "movie",
-        itemId: { $nin: likedItemIds },
-        interactionType: { $in: ["like", "favorite"] },
-      })
-        .populate("itemId")
-        .limit(limit * 2);
-
-      // Count occurrences (more occurrences = higher score)
-      const movieScores = {};
-      recommendations.forEach((interaction) => {
-        if (interaction.itemId) {
-          const id = interaction.itemId._id.toString();
-          if (!movieScores[id]) {
-            movieScores[id] = {
-              movie: interaction.itemId,
-              score: 0,
-            };
-          }
-          movieScores[id].score += 1;
-        }
-      });
-
-      const scored = Object.values(movieScores)
-        .map((item) => ({
-          ...item.movie.toObject(),
-          recommendationScore: item.score,
-        }))
-        .sort((a, b) => b.recommendationScore - a.recommendationScore)
-        .slice(0, limit);
-
-      return scored;
+      // Return just the recommendations array for hybrid combination
+      return result.recommendations.slice(0, limit);
     } catch (error) {
       console.error("Error in collaborative movie filtering:", error);
       return [];
@@ -313,67 +264,17 @@ class RecommendationEngine {
 
   /**
    * Collaborative Filtering for Music
-   * Recommends music liked by similar users
+   * Uses improved cosine similarity algorithm
    */
   async getCollaborativeMusic(userId, limit = 20) {
     try {
-      // Find users with similar taste
-      const userLikes = await UserInteraction.find({
-        user: userId,
-        itemType: "music",
-        interactionType: { $in: ["like", "favorite"] },
-      }).select("itemId");
+      const result = await collaborativeFilteringService.getCollaborativeMusicRecommendations(
+        userId,
+        { k: 30, limit: limit * 2, minOverlap: 2 }
+      );
 
-      if (userLikes.length === 0) {
-        return [];
-      }
-
-      const likedItemIds = userLikes.map((like) => like.itemId);
-
-      // Find other users who liked the same music
-      const similarUsers = await UserInteraction.find({
-        itemId: { $in: likedItemIds },
-        user: { $ne: userId },
-        itemType: "music",
-        interactionType: { $in: ["like", "favorite"] },
-      })
-        .distinct("user")
-        .limit(50);
-
-      // Get music liked by similar users
-      const recommendations = await UserInteraction.find({
-        user: { $in: similarUsers },
-        itemType: "music",
-        itemId: { $nin: likedItemIds },
-        interactionType: { $in: ["like", "favorite"] },
-      })
-        .populate("itemId")
-        .limit(limit * 2);
-
-      // Count occurrences
-      const musicScores = {};
-      recommendations.forEach((interaction) => {
-        if (interaction.itemId) {
-          const id = interaction.itemId._id.toString();
-          if (!musicScores[id]) {
-            musicScores[id] = {
-              music: interaction.itemId,
-              score: 0,
-            };
-          }
-          musicScores[id].score += 1;
-        }
-      });
-
-      const scored = Object.values(musicScores)
-        .map((item) => ({
-          ...item.music.toObject(),
-          recommendationScore: item.score,
-        }))
-        .sort((a, b) => b.recommendationScore - a.recommendationScore)
-        .slice(0, limit);
-
-      return scored;
+      // Return just the recommendations array for hybrid combination
+      return result.recommendations.slice(0, limit);
     } catch (error) {
       console.error("Error in collaborative music filtering:", error);
       return [];

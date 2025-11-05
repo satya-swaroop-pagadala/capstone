@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import recommendationService from "../services/recommendationService.js";
+import collaborativeFilteringService from "../services/collaborativeFilteringService.js";
 
 /**
  * @desc    Get personalized movie recommendations
@@ -102,3 +103,122 @@ export const getLikedMusic = asyncHandler(async (req, res) => {
     data: likedMusic,
   });
 });
+
+/**
+ * @desc    Get collaborative filtering movie recommendations
+ * @route   GET /api/recommendations/collaborative/movies
+ * @access  Private
+ */
+export const getCollaborativeMovies = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const {
+    k = 30,
+    limit = 20,
+    minOverlap = 2,
+    similarityMetric = "cosine",
+  } = req.query;
+
+  const result = await collaborativeFilteringService.getCollaborativeMovieRecommendations(
+    userId,
+    {
+      k: parseInt(k),
+      limit: parseInt(limit),
+      minOverlap: parseInt(minOverlap),
+      similarityMetric,
+    }
+  );
+
+  // If no CF recommendations, fall back to content-based
+  if (result.recommendations.length === 0) {
+    const fallback = await recommendationService.getMovieRecommendations(
+      userId,
+      null,
+      parseInt(limit)
+    );
+
+    return res.json({
+      success: true,
+      source: "fallback_content_based",
+      reason: result.reason || "cf_failed",
+      message: result.message || "Collaborative filtering returned no results. Using content-based recommendations.",
+      data: {
+        recommendations: fallback.recommendations || [],
+        neighbors: [],
+        stats: result.stats,
+      },
+    });
+  }
+
+  res.json({
+    success: true,
+    source: "collaborative_filtering",
+    data: result,
+  });
+});
+
+/**
+ * @desc    Get collaborative filtering music recommendations
+ * @route   GET /api/recommendations/collaborative/music
+ * @access  Private
+ */
+export const getCollaborativeMusic = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const {
+    k = 30,
+    limit = 20,
+    minOverlap = 2,
+    similarityMetric = "cosine",
+  } = req.query;
+
+  const result = await collaborativeFilteringService.getCollaborativeMusicRecommendations(
+    userId,
+    {
+      k: parseInt(k),
+      limit: parseInt(limit),
+      minOverlap: parseInt(minOverlap),
+      similarityMetric,
+    }
+  );
+
+  // If no CF recommendations, fall back to content-based
+  if (result.recommendations.length === 0) {
+    const fallback = await recommendationService.getMusicRecommendations(
+      userId,
+      null,
+      parseInt(limit)
+    );
+
+    return res.json({
+      success: true,
+      source: "fallback_content_based",
+      reason: result.reason || "cf_failed",
+      message: result.message || "Collaborative filtering returned no results. Using content-based recommendations.",
+      data: {
+        recommendations: fallback.recommendations || [],
+        neighbors: [],
+        stats: result.stats,
+      },
+    });
+  }
+
+  res.json({
+    success: true,
+    source: "collaborative_filtering",
+    data: result,
+  });
+});
+
+/**
+ * @desc    Audit collaborative filtering data readiness
+ * @route   GET /api/recommendations/collaborative/audit
+ * @access  Private (Admin recommended)
+ */
+export const auditCFData = asyncHandler(async (req, res) => {
+  const audit = await collaborativeFilteringService.auditCollaborativeFilteringData();
+
+  res.json({
+    success: true,
+    data: audit,
+  });
+});
+

@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Star, Heart, Filter, Sparkles, TrendingUp, Zap } from 'lucide-react';
-import api, { getMovieRecommendations, trackInteraction, type Movie as APIMovie } from '../api/api';
+import { Star, Heart, Filter, Sparkles, TrendingUp, Zap, Users, ThumbsUp } from 'lucide-react';
+import api, { 
+  getMovieRecommendations, 
+  trackInteraction, 
+  getCollaborativeMovieRecommendations,
+  getLikedMovies,
+  type Movie as APIMovie,
+  type CFRecommendation 
+} from '../api/api';
 import { useAuth } from '../context/AuthContext';
 
 interface Movie {
@@ -30,6 +37,12 @@ export default function MoviesPage() {
   const [totalMovies, setTotalMovies] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const moviesPerPage = 24;
+
+  // Collaborative Filtering states
+  const [showCFSection, setShowCFSection] = useState(false);
+  const [likedMovies, setLikedMovies] = useState<APIMovie[]>([]);
+  const [cfRecommendations, setCfRecommendations] = useState<CFRecommendation | null>(null);
+  const [loadingCF, setLoadingCF] = useState(false);
 
   // Fetch movies, moods, and genres from API
   useEffect(() => {
@@ -117,6 +130,26 @@ export default function MoviesPage() {
     setCurrentPage(1);
   }, [selectedMood, selectedGenre, showTrending]);
 
+  // Fetch CF recommendations and liked movies
+  const fetchCFRecommendations = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingCF(true);
+      const [liked, cf] = await Promise.all([
+        getLikedMovies(),
+        getCollaborativeMovieRecommendations(30, 20, 2)
+      ]);
+      
+      setLikedMovies(liked);
+      setCfRecommendations(cf);
+    } catch (error) {
+      console.error('Error fetching CF recommendations:', error);
+    } finally {
+      setLoadingCF(false);
+    }
+  };
+
   const toggleFavorite = async (id: string) => {
     const isCurrentlyFavorite = favorites.has(id);
     
@@ -143,6 +176,11 @@ export default function MoviesPage() {
       if (!isCurrentlyFavorite) {
         const recommended = await getMovieRecommendations(selectedMood || undefined);
         setRecommendedMovies((recommended.recommendations as APIMovie[]) || []);
+        
+        // Refresh CF recommendations if CF section is shown
+        if (showCFSection) {
+          await fetchCFRecommendations();
+        }
       }
     } catch (error) {
       console.error('Error tracking interaction:', error);
@@ -164,7 +202,7 @@ export default function MoviesPage() {
       </div>
 
       {/* Trending Worldwide Button */}
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-4">
         <button
           onClick={() => {
             setShowTrending(!showTrending);
@@ -172,6 +210,7 @@ export default function MoviesPage() {
               // Clear other filters when enabling trending
               setSelectedMood('');
               setSelectedGenre('');
+              setShowCFSection(false);
             }
           }}
           className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all transform hover:scale-105 ${
@@ -183,6 +222,25 @@ export default function MoviesPage() {
           <TrendingUp className="w-5 h-5" />
           <span>{showTrending ? '🔥 Showing Trending Worldwide' : '🌍 View Trending Worldwide'}</span>
         </button>
+
+        {user && !showTrending && (
+          <button
+            onClick={() => {
+              setShowCFSection(!showCFSection);
+              if (!showCFSection) {
+                fetchCFRecommendations();
+              }
+            }}
+            className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all transform hover:scale-105 ${
+              showCFSection
+                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg shadow-purple-500/50'
+                : 'bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 hover:from-slate-200 hover:to-slate-300'
+            }`}
+          >
+            <Users className="w-5 h-5" />
+            <span>{showCFSection ? '💡 Showing Based on Your Likes' : '🎯 Movies Based on What You Like'}</span>
+          </button>
+        )}
       </div>
 
       {!showTrending && (
@@ -243,6 +301,175 @@ export default function MoviesPage() {
               <span> - Popular releases from the last 3 years</span>
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Collaborative Filtering Section - My Liked Movies & CF Recommendations */}
+      {showCFSection && user && !showTrending && (
+        <div className="space-y-8 bg-gradient-to-br from-purple-50 to-indigo-50 p-8 rounded-2xl border-2 border-purple-200">
+          {/* My Liked Movies */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <ThumbsUp className="w-7 h-7 text-purple-600" />
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800">Movies You've Liked</h2>
+                  <p className="text-slate-600 text-sm">These movies shape your personalized recommendations</p>
+                </div>
+              </div>
+              {likedMovies.length > 0 && (
+                <div className="bg-purple-100 px-4 py-2 rounded-full">
+                  <span className="text-purple-700 font-semibold">{likedMovies.length} Liked</span>
+                </div>
+              )}
+            </div>
+
+            {loadingCF ? (
+              <div className="text-center py-12">
+                <p className="text-slate-500">Loading your liked movies...</p>
+              </div>
+            ) : likedMovies.length > 0 ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {likedMovies.map(movie => (
+                  <div key={movie._id} className="bg-white rounded-lg shadow-md border border-purple-100 overflow-hidden hover:shadow-xl transition-shadow group">
+                    <div className="relative h-48 overflow-hidden bg-slate-200">
+                      <img
+                        src={movie.posterUrl}
+                        alt={movie.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute bottom-2 left-2 flex items-center space-x-1 bg-slate-900/80 backdrop-blur-sm px-2 py-1 rounded">
+                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        <span className="text-white text-xs font-medium">{movie.rating}</span>
+                      </div>
+                      <div className="absolute top-2 right-2 p-1.5 bg-red-500 rounded-full">
+                        <Heart className="w-4 h-4 fill-white text-white" />
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      <h3 className="text-sm font-semibold text-slate-800 line-clamp-1">{movie.title}</h3>
+                      <p className="text-xs text-slate-500 mt-1">{movie.releaseYear}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white p-8 rounded-lg text-center border border-purple-200">
+                <Heart className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-600 mb-2">You haven't liked any movies yet</p>
+                <p className="text-sm text-slate-500">Start liking movies to get personalized collaborative filtering recommendations!</p>
+              </div>
+            )}
+          </div>
+
+          {/* CF-Based Recommendations */}
+          {cfRecommendations && cfRecommendations.recommendations && cfRecommendations.recommendations.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <Users className="w-7 h-7 text-indigo-600" />
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-800">Recommended Based on Similar Users</h2>
+                    <p className="text-slate-600 text-sm">
+                      People with similar taste also enjoyed these movies
+                      {cfRecommendations.neighbors && cfRecommendations.neighbors.length > 0 && (
+                        <span className="ml-1">
+                          ({cfRecommendations.neighbors.length} similar users found)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                {cfRecommendations.source && (
+                  <div className={`px-4 py-2 rounded-full ${
+                    cfRecommendations.source === 'collaborative_filtering' 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-yellow-100 text-yellow-700'
+                  }`}>
+                    <span className="text-sm font-semibold">
+                      {cfRecommendations.source === 'collaborative_filtering' ? '✓ CF Active' : '⚠ Fallback'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {cfRecommendations.recommendations.map(movie => (
+                  <div key={movie._id} className="bg-white rounded-xl shadow-md border border-indigo-200 overflow-hidden hover:shadow-2xl transition-all group">
+                    <div className="relative h-56 overflow-hidden bg-slate-200">
+                      <img
+                        src={movie.posterUrl}
+                        alt={movie.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <button
+                        onClick={() => toggleFavorite(movie._id)}
+                        className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+                      >
+                        <Heart
+                          className={`w-5 h-5 ${favorites.has(movie._id) ? 'fill-red-500 text-red-500' : 'text-slate-600'}`}
+                        />
+                      </button>
+                      <div className="absolute bottom-3 left-3 flex items-center space-x-1 bg-slate-900/80 backdrop-blur-sm px-2 py-1 rounded">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-white text-sm font-medium">{movie.rating}</span>
+                      </div>
+                      {movie.recommendationScore && (
+                        <div className="absolute top-3 left-3 bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold">
+                          {(movie.recommendationScore * 10).toFixed(0)}% Match
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-slate-800 line-clamp-1">{movie.title}</h3>
+                        <span className="text-sm text-slate-500 whitespace-nowrap ml-2">{movie.releaseYear}</span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {movie.genre.slice(0, 2).map((g: string) => (
+                          <span key={g} className="text-xs px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full">
+                            {g}
+                          </span>
+                        ))}
+                      </div>
+
+                      <p className="text-sm text-slate-600 line-clamp-2">{movie.overview}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {cfRecommendations.stats && (
+                <div className="mt-6 bg-white p-4 rounded-lg border border-indigo-200">
+                  <p className="text-sm text-slate-600 text-center">
+                    <span className="font-semibold text-indigo-600">{cfRecommendations.stats.similarUsers}</span> users with similar taste found
+                    {cfRecommendations.stats.candidateItems > 0 && (
+                      <>
+                        {' • '}
+                        <span className="font-semibold text-indigo-600">{cfRecommendations.stats.candidateItems}</span> unique recommendations
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {cfRecommendations && (!cfRecommendations.recommendations || cfRecommendations.recommendations.length === 0) && likedMovies.length > 0 && (
+            <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+              <div className="flex items-start space-x-3">
+                <Sparkles className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-yellow-900 mb-2">Not Enough Data for Collaborative Filtering</h3>
+                  <p className="text-sm text-yellow-800">
+                    {cfRecommendations.message || "We need more users with similar taste to provide collaborative filtering recommendations. Keep liking movies, and we'll find great matches for you!"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

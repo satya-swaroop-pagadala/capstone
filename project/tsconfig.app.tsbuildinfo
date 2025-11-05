@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/api/api.ts","./src/components/moviespage.tsx","./src/components/moviespage_old.tsx","./src/components/musicpage.tsx","./src/components/musicpage_old.tsx","./src/context/authcontext.tsx","./src/pages/loginpage.tsx","./src/pages/signuppage.tsx"],"version":"5.9.3"}

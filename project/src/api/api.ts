@@ -144,6 +144,7 @@ export interface Movie {
   releaseYear: number;
   posterUrl: string;
   rating: number;
+  recommendationScore?: number; // Score from recommendation algorithms (0-1)
 }
 
 export const fetchMovies = async (mood?: string, genre?: string): Promise<Movie[]> => {
@@ -354,6 +355,68 @@ export const getLikedMusic = async (): Promise<Song[]> => {
     return response.data.data;
   } catch (error) {
     console.error("Error getting liked music:", error);
+    throw error;
+  }
+};
+
+// Collaborative Filtering Recommendations
+export interface CFRecommendation {
+  recommendations: Movie[];
+  neighbors: Array<{
+    similarity: number;
+    overlap: number;
+    itemCount?: number;
+  }>;
+  stats?: {
+    totalUsers: number;
+    similarUsers: number;
+    topKNeighbors: number;
+    candidateItems: number;
+    targetUserItems: number;
+  };
+  source?: string;
+  reason?: string;
+  message?: string;
+}
+
+export const getCollaborativeMovieRecommendations = async (
+  k: number = 30,
+  limit: number = 20,
+  minOverlap: number = 2
+): Promise<CFRecommendation> => {
+  try {
+    const params = new URLSearchParams();
+    params.append("k", k.toString());
+    params.append("limit", limit.toString());
+    params.append("minOverlap", minOverlap.toString());
+
+    const response = await api.get(
+      `/api/recommendations/collaborative/movies?${params}`
+    );
+    return response.data.data || response.data;
+  } catch (error) {
+    console.error("Error getting collaborative movie recommendations:", error);
+    throw error;
+  }
+};
+
+export const getCollaborativeMusicRecommendations = async (
+  k: number = 30,
+  limit: number = 20,
+  minOverlap: number = 2
+): Promise<CFRecommendation> => {
+  try {
+    const params = new URLSearchParams();
+    params.append("k", k.toString());
+    params.append("limit", limit.toString());
+    params.append("minOverlap", minOverlap.toString());
+
+    const response = await api.get(
+      `/api/recommendations/collaborative/music?${params}`
+    );
+    return response.data.data || response.data;
+  } catch (error) {
+    console.error("Error getting collaborative music recommendations:", error);
     throw error;
   }
 };
