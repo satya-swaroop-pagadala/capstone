@@ -9,7 +9,7 @@ const userInteractionSchema = new mongoose.Schema(
     },
     itemType: {
       type: String,
-      enum: ["Movie", "Music"],
+      enum: ["Movie", "Music", "movie", "music"], // Allow both for backward compatibility
       required: true,
     },
     itemId: {
