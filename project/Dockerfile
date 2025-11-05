@@ -26,12 +26,14 @@ FROM --platform=linux/amd64 node:18-slim
 
 WORKDIR /app
 
+# Install serve globally
+RUN npm install -g serve
+
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
-COPY static-server.js ./
 
 # Expose port (Railway will override with PORT env var)
 EXPOSE 3000
 
-# Start the Node.js static server
-CMD ["node", "static-server.js"]
+# Start with serve package (simpler and more reliable)
+CMD serve dist -s -l tcp://0.0.0.0:${PORT:-3000}
