@@ -69,50 +69,14 @@ export default function MoviesPage() {
         console.log('Favorite movie IDs:', favoriteIds);
         setFavorites(new Set(favoriteIds));
         
-        // Also load full liked movies data for display
+        // Also load full liked movies data for display (from UserInteraction only)
         try {
           const liked = await getLikedMovies();
-          console.log('Loaded liked movies from API:', liked);
-          
-          // If API returns empty, try getting from favorites directly
-          if (!liked || liked.length === 0) {
-            console.log('API returned no liked movies, fetching movie details from favorites...');
-            if (favoriteIds.length > 0) {
-              // Fetch full movie data for each favorite ID
-              const { fetchMovieById } = await import('../api/api');
-              const moviePromises = favoriteIds.map(id => 
-                fetchMovieById(id).catch(err => {
-                  console.error(`Error fetching movie ${id}:`, err);
-                  return null;
-                })
-              );
-              const movies = (await Promise.all(moviePromises)).filter(m => m !== null);
-              console.log('Fetched movies from favorites:', movies);
-              setLikedMovies(movies as APIMovie[]);
-            }
-          } else {
-            setLikedMovies(liked);
-          }
+          console.log('Loaded liked movies from UserInteraction:', liked);
+          setLikedMovies(liked);
         } catch (error) {
           console.error('Error loading liked movies:', error);
-          // Try fallback: load movies from favorite IDs
-          if (favoriteIds.length > 0) {
-            console.log('Fallback: loading movie details from favorite IDs');
-            try {
-              const { fetchMovieById } = await import('../api/api');
-              const moviePromises = favoriteIds.map(id => 
-                fetchMovieById(id).catch(err => {
-                  console.error(`Error fetching movie ${id}:`, err);
-                  return null;
-                })
-              );
-              const movies = (await Promise.all(moviePromises)).filter(m => m !== null);
-              console.log('Fallback fetched movies:', movies);
-              setLikedMovies(movies as APIMovie[]);
-            } catch (fallbackError) {
-              console.error('Fallback also failed:', fallbackError);
-            }
-          }
+          setLikedMovies([]);
         }
       } catch (error) {
         console.error('Error loading favorites:', error);
