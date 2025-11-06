@@ -360,25 +360,6 @@ export default function MoviesPage() {
           <TrendingUp className="w-5 h-5" />
           <span>{showTrending ? '🔥 Showing Trending Worldwide' : '🌍 View Trending Worldwide'}</span>
         </button>
-
-        {user && !showTrending && (
-          <button
-            onClick={() => {
-              setShowCFSection(!showCFSection);
-              if (!showCFSection) {
-                fetchCFRecommendations();
-              }
-            }}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all transform hover:scale-105 ${
-              showCFSection
-                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg shadow-purple-500/50'
-                : 'bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 hover:from-slate-200 hover:to-slate-300'
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            <span>{showCFSection ? '💡 Showing Based on Your Likes' : '🎯 Movies Based on What You Like'}</span>
-          </button>
-        )}
       </div>
 
       {!showTrending && (
