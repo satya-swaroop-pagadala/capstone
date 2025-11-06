@@ -12,6 +12,7 @@ import api, {
   type CFRecommendation 
 } from '../api/api';
 import { useAuth } from '../context/AuthContext';
+import MovieDetailModal from './MovieDetailModal';
 
 interface Movie {
   _id: string;
@@ -41,6 +42,10 @@ export default function MoviesPage() {
   const [totalMovies, setTotalMovies] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const moviesPerPage = 24;
+
+  // Movie detail modal state
+  const [selectedMovie, setSelectedMovie] = useState<Movie | APIMovie | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Collaborative Filtering states
   const [showCFSection, setShowCFSection] = useState(false);
@@ -455,7 +460,14 @@ export default function MoviesPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {likedMovies.map(movie => (
-              <div key={movie._id} className="bg-white rounded-lg shadow-md border border-pink-100 overflow-hidden hover:shadow-xl transition-all group">
+              <div 
+                key={movie._id} 
+                className="bg-white rounded-lg shadow-md border border-pink-100 overflow-hidden hover:shadow-xl transition-all group cursor-pointer"
+                onClick={() => {
+                  setSelectedMovie(movie);
+                  setIsModalOpen(true);
+                }}
+              >
                 <div className="relative h-40 overflow-hidden bg-slate-200">
                   <img
                     src={movie.posterUrl}
@@ -463,7 +475,10 @@ export default function MoviesPage() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <button
-                    onClick={() => toggleFavorite(movie)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(movie);
+                    }}
                     className="absolute top-2 right-2 p-1.5 bg-white/95 backdrop-blur-sm rounded-full hover:bg-white transition-colors shadow-md"
                     title="Remove from favorites"
                   >
@@ -686,7 +701,14 @@ export default function MoviesPage() {
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {recommendedMovies.slice(0, 8).map(movie => (
-              <div key={movie._id} className="bg-white rounded-xl shadow-sm border border-purple-200 overflow-hidden hover:shadow-lg transition-shadow group">
+              <div 
+                key={movie._id} 
+                className="bg-white rounded-xl shadow-sm border border-purple-200 overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer"
+                onClick={() => {
+                  setSelectedMovie(movie);
+                  setIsModalOpen(true);
+                }}
+              >
                 <div className="relative h-56 overflow-hidden bg-slate-200">
                   <img
                     src={movie.posterUrl}
@@ -694,7 +716,10 @@ export default function MoviesPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <button
-                    onClick={() => toggleFavorite(movie)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(movie);
+                    }}
                     className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                     aria-label={favorites.has(movie._id) ? 'Remove from favorites' : 'Add to favorites'}
                   >
@@ -746,7 +771,14 @@ export default function MoviesPage() {
         <>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {movies.map(movie => (
-              <div key={movie._id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group">
+              <div 
+                key={movie._id} 
+                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer"
+                onClick={() => {
+                  setSelectedMovie(movie);
+                  setIsModalOpen(true);
+                }}
+              >
                 <div className="relative h-56 overflow-hidden bg-slate-200">
                   <img
                     src={movie.posterUrl}
@@ -754,7 +786,10 @@ export default function MoviesPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <button
-                    onClick={() => toggleFavorite(movie)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(movie);
+                    }}
                     className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                     aria-label={favorites.has(movie._id) ? 'Remove from favorites' : 'Add to favorites'}
                   >
@@ -810,6 +845,18 @@ export default function MoviesPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* Movie Detail Modal */}
+      {selectedMovie && (
+        <MovieDetailModal
+          movie={selectedMovie}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedMovie(null);
+          }}
+        />
       )}
     </div>
   );
