@@ -1,6 +1,10 @@
 import asyncHandler from "express-async-handler";
 import recommendationService from "../services/recommendationService.js";
 import collaborativeFilteringService from "../services/collaborativeFilteringService.js";
+import User from "../models/userModel.js";
+import Movie from "../models/movieModel.js";
+import Music from "../models/musicModel.js";
+import { getCollaborativeRecommendations } from "../utils/collaborativeFiltering.js";
 
 /**
  * @desc    Get personalized movie recommendations
@@ -222,3 +226,37 @@ export const auditCFData = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * @desc    Get simple user-user collaborative filtering recommendations
+ * @route   GET /api/recommendations/user/:userId
+ * @access  Public (for testing)
+ */
+export const getUserCollaborativeRecommendations = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Fetch all users with their liked items
+    const users = await User.find({}).select('likedMovies likedMusic');
+    
+    // Get recommended item IDs
+    const recommendedIds = getCollaborativeRecommendations(users, userId);
+    
+    // Fetch the actual movie and music documents
+    const movies = await Movie.find({ _id: { $in: recommendedIds } });
+    const music = await Music.find({ _id: { $in: recommendedIds } });
+    
+    res.json({ 
+      success: true,
+      movies, 
+      music,
+      totalRecommendations: movies.length + music.length
+    });
+  } catch (err) {
+    console.error('Error in getUserCollaborativeRecommendations:', err);
+    res.status(500).json({ 
+      success: false,
+      error: "Error generating recommendations",
+      message: err.message 
+    });
+  }
+});

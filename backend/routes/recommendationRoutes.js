@@ -8,12 +8,16 @@ import {
   getCollaborativeMovies,
   getCollaborativeMusic,
   auditCFData,
+  getUserCollaborativeRecommendations,
 } from "../controllers/recommendationController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// All routes require authentication
+// Simple user-user collaborative filtering (public for testing - no auth required)
+router.get("/user/:userId", getUserCollaborativeRecommendations);
+
+// All other routes require authentication
 router.use(protect);
 
 // Get personalized recommendations (hybrid)

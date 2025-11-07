@@ -1,6 +1,7 @@
 import Favorite from "../models/favoriteModel.js";
 import Movie from "../models/movieModel.js";
 import Music from "../models/musicModel.js";
+import User from "../models/userModel.js";
 
 // @desc    Get all favorites for a user
 // @route   GET /api/favorites
@@ -56,6 +57,17 @@ const addFavorite = async (req, res) => {
       artist,
     });
 
+    // Also add to User's likedMovies or likedMusic array for collaborative filtering
+    if (itemType === 'Movie') {
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { likedMovies: itemId }
+      });
+    } else if (itemType === 'Music') {
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { likedMusic: itemId }
+      });
+    }
+
     console.log('Added favorite:', { userId, itemId, itemType });
     res.status(201).json({ favorite });
   } catch (error) {
@@ -74,6 +86,17 @@ const removeFavorite = async (req, res) => {
 
     if (!favorite) {
       return res.status(404).json({ message: "Favorite not found" });
+    }
+
+    // Remove from User's likedMovies or likedMusic array
+    if (favorite.itemType === 'Movie') {
+      await User.findByIdAndUpdate(userId, {
+        $pull: { likedMovies: favorite.itemId }
+      });
+    } else if (favorite.itemType === 'Music') {
+      await User.findByIdAndUpdate(userId, {
+        $pull: { likedMusic: favorite.itemId }
+      });
     }
 
     await favorite.deleteOne();
@@ -102,6 +125,17 @@ const removeFavoriteByItem = async (req, res) => {
 
     if (!favorite) {
       return res.status(404).json({ message: "Favorite not found" });
+    }
+
+    // Remove from User's likedMovies or likedMusic array
+    if (itemType === 'Movie') {
+      await User.findByIdAndUpdate(userId, {
+        $pull: { likedMovies: itemId }
+      });
+    } else if (itemType === 'Music') {
+      await User.findByIdAndUpdate(userId, {
+        $pull: { likedMusic: itemId }
+      });
     }
 
     console.log('Removed favorite by item:', { userId, itemId, itemType });

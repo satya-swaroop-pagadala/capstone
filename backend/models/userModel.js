@@ -33,6 +33,18 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    likedMovies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Movie",
+      },
+    ],
+    likedMusic: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Music",
+      },
+    ],
   },
   {
     timestamps: true,
