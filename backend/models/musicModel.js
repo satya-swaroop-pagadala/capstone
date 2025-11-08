@@ -20,6 +20,10 @@ const musicSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    url: {
+      type: String,
+      default: "",
+    },
     coverUrl: {
       type: String,
       default: "",

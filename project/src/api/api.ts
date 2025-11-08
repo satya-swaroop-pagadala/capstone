@@ -182,6 +182,7 @@ export interface Song {
   album: string;
   coverUrl: string;
   duration?: string;
+  url?: string;
 }
 
 export const fetchMusic = async (mood?: string, genre?: string): Promise<Song[]> => {
@@ -374,8 +375,8 @@ export const getLikedMusic = async (): Promise<Song[]> => {
 
 // Collaborative Filtering Recommendations
 export interface CFRecommendation {
-  recommendations: Movie[];
-  neighbors: Array<{
+  recommendations: Array<Movie | Song>;
+  neighbors?: Array<{
     similarity: number;
     overlap: number;
     itemCount?: number;
@@ -406,7 +407,19 @@ export const getCollaborativeMovieRecommendations = async (
     const response = await api.get(
       `/api/recommendations/collaborative/movies?${params}`
     );
-    return response.data.data || response.data;
+
+    const payload = response.data || {};
+    const data = payload.data || payload || {};
+
+    return {
+      ...data,
+      recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
+      neighbors: Array.isArray(data.neighbors) ? data.neighbors : [],
+      stats: data.stats,
+      source: payload.source || data.source,
+      reason: payload.reason || data.reason,
+      message: payload.message || data.message,
+    } as CFRecommendation;
   } catch (error) {
     console.error("Error getting collaborative movie recommendations:", error);
     throw error;
@@ -427,7 +440,19 @@ export const getCollaborativeMusicRecommendations = async (
     const response = await api.get(
       `/api/recommendations/collaborative/music?${params}`
     );
-    return response.data.data || response.data;
+
+    const payload = response.data || {};
+    const data = payload.data || payload || {};
+
+    return {
+      ...data,
+      recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
+      neighbors: Array.isArray(data.neighbors) ? data.neighbors : [],
+      stats: data.stats,
+      source: payload.source || data.source,
+      reason: payload.reason || data.reason,
+      message: payload.message || data.message,
+    } as CFRecommendation;
   } catch (error) {
     console.error("Error getting collaborative music recommendations:", error);
     throw error;

@@ -2,6 +2,7 @@ import Favorite from "../models/favoriteModel.js";
 import Movie from "../models/movieModel.js";
 import Music from "../models/musicModel.js";
 import User from "../models/userModel.js";
+import UserInteraction from "../models/userInteractionModel.js";
 
 // @desc    Get all favorites for a user
 // @route   GET /api/favorites
@@ -99,6 +100,14 @@ const removeFavorite = async (req, res) => {
       });
     }
 
+    // Remove related interaction records so analytics stay in sync
+    await UserInteraction.deleteMany({
+      user: userId,
+      itemId: favorite.itemId,
+      itemType: { $in: [favorite.itemType, favorite.itemType?.toLowerCase(), favorite.itemType?.toUpperCase()] },
+      interactionType: { $in: ["like", "favorite"] },
+    });
+
     await favorite.deleteOne();
     console.log('Removed favorite:', { userId, favoriteId: req.params.id });
     res.json({ message: "Favorite removed" });
@@ -117,28 +126,68 @@ const removeFavoriteByItem = async (req, res) => {
     const { itemType } = req.query;
     const userId = req.user._id;
 
-    const favorite = await Favorite.findOneAndDelete({
+    const normalizedType = typeof itemType === 'string' ? itemType.trim() : '';
+    const candidateTypes = normalizedType
+      ? Array.from(new Set([
+          normalizedType,
+          normalizedType.toLowerCase(),
+          normalizedType.toUpperCase(),
+          normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1).toLowerCase(),
+        ]))
+      : [];
+
+    console.log('🔍 removeFavoriteByItem attempt:', {
+      userId: userId?.toString(),
+      itemId,
+      itemTypeCandidates: candidateTypes,
+    });
+
+    const favorite = await Favorite.findOne({
       userId,
       itemId,
-      itemType,
+      ...(candidateTypes.length
+        ? { itemType: { $in: candidateTypes } }
+        : {}),
     });
 
     if (!favorite) {
+      console.warn('⚠️ Favorite not found for removal', {
+        userId: userId?.toString(),
+        itemId,
+        requestedType: itemType,
+      });
       return res.status(404).json({ message: "Favorite not found" });
     }
 
+    await favorite.deleteOne();
+
     // Remove from User's likedMovies or likedMusic array
-    if (itemType === 'Movie') {
+    const effectiveType = favorite.itemType || normalizedType;
+    if (effectiveType?.toLowerCase() === 'movie') {
       await User.findByIdAndUpdate(userId, {
         $pull: { likedMovies: itemId }
       });
-    } else if (itemType === 'Music') {
+    } else if (effectiveType?.toLowerCase() === 'music') {
       await User.findByIdAndUpdate(userId, {
         $pull: { likedMusic: itemId }
       });
     }
 
-    console.log('Removed favorite by item:', { userId, itemId, itemType });
+    // Remove related interaction records to keep liked lists in sync
+    const interactionTypeCandidates = effectiveType
+      ? [effectiveType, effectiveType.toLowerCase(), effectiveType.toUpperCase()]
+      : candidateTypes;
+
+    await UserInteraction.deleteMany({
+      user: userId,
+      itemId: favorite.itemId,
+      ...(interactionTypeCandidates.length
+        ? { itemType: { $in: interactionTypeCandidates } }
+        : {}),
+      interactionType: { $in: ["like", "favorite"] },
+    });
+
+    console.log('Removed favorite by item:', { userId, itemId, itemType: favorite.itemType });
     res.json({ message: "Favorite removed" });
   } catch (error) {
     console.error('Error removing favorite by item:', error);

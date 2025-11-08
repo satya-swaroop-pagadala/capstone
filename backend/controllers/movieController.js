@@ -1,5 +1,38 @@
 import Movie from "../models/movieModel.js";
 
+// Normalize incoming query params (string, array, comma-separated) into a clean array
+const normalizeQueryValue = (value) => {
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value
+      .flatMap((item) => String(item).split(","))
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .flatMap((item) => String(item).split(","))
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+    } catch (error) {
+      // Ignore JSON parse errors and fall back to comma splitting
+    }
+
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [value].filter(Boolean);
+};
+
 // @desc    Get all movies with optional filtering
 // @route   GET /api/movies
 // @access  Public
@@ -8,12 +41,14 @@ export const getMovies = async (req, res) => {
     const { mood, genre, search, limit = 50, page = 1 } = req.query;
     const query = {};
 
-    if (genre) {
-      query.genre = { $in: [genre] };
+    const genreFilters = normalizeQueryValue(genre);
+    if (genreFilters.length > 0) {
+      query.genre = { $in: genreFilters };
     }
 
-    if (mood) {
-      query.mood = { $in: [mood] };
+    const moodFilters = normalizeQueryValue(mood);
+    if (moodFilters.length > 0) {
+      query.mood = { $in: moodFilters };
     }
 
     if (search) {
@@ -40,7 +75,6 @@ export const getMovies = async (req, res) => {
   }
 };
 
-// @desc    Get movies by mood
 // @route   GET /api/movies/mood/:mood
 // @access  Public
 export const getMoviesByMood = async (req, res) => {
