@@ -15,7 +15,7 @@ RUN rm -rf node_modules && \
 COPY . .
 
 # Set build-time environment variable
-ARG VITE_API_URL=https://project123-production-13d6.up.railway.app
+ARG VITE_API_URL=http://localhost:5001/
 ENV VITE_API_URL=$VITE_API_URL
 
 # Build the application

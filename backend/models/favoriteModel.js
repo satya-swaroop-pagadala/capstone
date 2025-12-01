@@ -9,9 +9,8 @@ const favoriteSchema = new mongoose.Schema(
       index: true, // Index for faster queries
     },
     itemId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
-      refPath: "itemType",
     },
     itemType: {
       type: String,

@@ -25,44 +25,46 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Connect to MongoDB and run migrations
-connectDB().then(async () => {
-  try {
-    // Fix any existing itemType values to use capitalized format
-    const { default: UserInteraction } = await import('./models/userInteractionModel.js');
-    
-    // Log the actual enum values loaded from the model
-    const schema = UserInteraction.schema.path('itemType');
-    console.log('📋 UserInteraction.itemType enum values:', schema.enumValues);
-    
-    const result = await UserInteraction.updateMany(
-      { itemType: { $in: ['movie', 'music'] } },
-      [{ 
-        $set: { 
-          itemType: { 
-            $switch: {
-              branches: [
-                { case: { $eq: ['$itemType', 'movie'] }, then: 'Movie' },
-                { case: { $eq: ['$itemType', 'music'] }, then: 'Music' }
-              ],
-              default: '$itemType'
-            }
-          }
-        }
-      }]
-    );
-    if (result.modifiedCount > 0) {
-      console.log(`✅ Auto-migration: Updated ${result.modifiedCount} itemType values to capitalized format`);
-    }
-  } catch (error) {
-    console.error('⚠️ Auto-migration warning:', error.message);
-  }
-});
+// connectDB().then(async () => {
+//   try {
+//     // Fix any existing itemType values to use capitalized format
+//     const { default: UserInteraction } = await import('./models/userInteractionModel.js');
+
+//     // Log the actual enum values loaded from the model
+//     const schema = UserInteraction.schema.path('itemType');
+//     console.log('📋 UserInteraction.itemType enum values:', schema.enumValues);
+
+//     const result = await UserInteraction.updateMany(
+//       { itemType: { $in: ['movie', 'music'] } },
+//       [{ 
+//         $set: { 
+//           itemType: { 
+//             $switch: {
+//               branches: [
+//                 { case: { $eq: ['$itemType', 'movie'] }, then: 'Movie' },
+//                 { case: { $eq: ['$itemType', 'music'] }, then: 'Music' }
+//               ],
+//               default: '$itemType'
+//             }
+//           }
+//         }
+//       }]
+//     );
+//     if (result.modifiedCount > 0) {
+//       console.log(`✅ Auto-migration: Updated ${result.modifiedCount} itemType values to capitalized format`);
+//     }
+//   } catch (error) {
+//     console.error('⚠️ Auto-migration warning:', error.message);
+//   }
+// });
+
+connectDB();
 
 // Initialize Express app
 const app = express();
 
 // CORS Configuration - Allow frontend to connect
-const corsOrigins = process.env.CORS_ORIGIN 
+const corsOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim().replace(/\/$/, ''))
   : ['http://localhost:5173', 'http://127.0.0.1:5173'];
 
@@ -134,12 +136,12 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('❌ Error occurred:', err.message);
   console.error('Stack:', err.stack);
-  
+
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  
+
   res.status(statusCode).json({
     message: err.message || "Internal Server Error",
-    ...(process.env.NODE_ENV !== "production" && { 
+    ...(process.env.NODE_ENV !== "production" && {
       stack: err.stack,
       error: err.toString()
     }),
@@ -155,7 +157,9 @@ console.log(`   NODE_ENV: ${process.env.NODE_ENV || "development"}`);
 console.log(`   MONGO_URI: ${process.env.MONGO_URI ? 'Set ✓' : 'Missing ✗'}`);
 console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? 'Set ✓' : 'Missing ✗'}`);
 
+console.log('Attempting to start server...');
 const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log('Inside listen callback');
   console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`✅ Server is ready to accept connections`);

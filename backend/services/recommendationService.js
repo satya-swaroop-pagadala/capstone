@@ -3,6 +3,7 @@ import Movie from "../models/movieModel.js";
 import Music from "../models/musicModel.js";
 import Favorite from "../models/favoriteModel.js";
 import collaborativeFilteringService from "./collaborativeFilteringService.js";
+import { getMovieDataset, filterMovies } from "../utils/datasetLoader.js";
 
 /**
  * Hybrid Recommendation System
@@ -42,8 +43,18 @@ class RecommendationEngine {
       // 5. Get liked movies for display
       const likedMovies = await this.getLikedMovies(userId);
 
+      let recommendations = combined;
+      if (!Array.isArray(recommendations) || recommendations.length === 0) {
+        const dataset = await getMovieDataset();
+        const datasetFiltered = filterMovies(dataset, {
+          moods: mood ? [mood] : [],
+        });
+        const fallback = datasetFiltered.length > 0 ? datasetFiltered : dataset;
+        recommendations = fallback.slice(0, limit);
+      }
+
       return {
-        recommendations: combined,
+        recommendations,
         liked: likedMovies,
         mood: mood,
       };
@@ -112,8 +123,14 @@ class RecommendationEngine {
         .limit(50);
 
       if (userLikes.length === 0) {
-        // Return popular movies if no history
-        return await Movie.find().sort({ popularity: -1 }).limit(limit);
+        // Return popular movies if no history, falling back to dataset if needed
+        const popularMovies = await Movie.find().sort({ popularity: -1 }).limit(limit);
+        if (popularMovies.length > 0) {
+          return popularMovies;
+        }
+
+        const dataset = await getMovieDataset();
+        return dataset.slice(0, limit);
       }
 
       // Extract genres and moods from liked movies
@@ -155,10 +172,22 @@ class RecommendationEngine {
         return { ...movie.toObject(), recommendationScore: score };
       });
 
-      return scored.sort((a, b) => b.recommendationScore - a.recommendationScore).slice(0, limit);
+      const sorted = scored.sort((a, b) => b.recommendationScore - a.recommendationScore);
+      if (sorted.length > 0) {
+        return sorted.slice(0, limit);
+      }
+
+      const dataset = await getMovieDataset();
+      const datasetFiltered = filterMovies(dataset, {
+        genres: Array.from(likedGenres),
+        moods: Array.from(likedMoods),
+      });
+      const fallback = datasetFiltered.length > 0 ? datasetFiltered : dataset;
+      return fallback.slice(0, limit);
     } catch (error) {
       console.error("Error in content-based movie filtering:", error);
-      return [];
+      const dataset = await getMovieDataset();
+      return dataset.slice(0, limit);
     }
   }
 
@@ -256,10 +285,16 @@ class RecommendationEngine {
       );
 
       // Return just the recommendations array for hybrid combination
-      return result.recommendations.slice(0, limit);
+      if (Array.isArray(result.recommendations) && result.recommendations.length > 0) {
+        return result.recommendations.slice(0, limit);
+      }
+
+      const dataset = await getMovieDataset();
+      return dataset.slice(0, limit);
     } catch (error) {
       console.error("Error in collaborative movie filtering:", error);
-      return [];
+      const dataset = await getMovieDataset();
+      return dataset.slice(0, limit);
     }
   }
 
@@ -304,13 +339,25 @@ class RecommendationEngine {
         .sort({ popularity: -1, rating: -1 })
         .limit(limit);
 
-      return moodMovies.map((movie) => ({
+      const enriched = moodMovies.map((movie) => ({
         ...movie.toObject(),
         recommendationScore: movie.rating || 0,
       }));
+
+      if (enriched.length > 0) {
+        return enriched;
+      }
+
+      const dataset = await getMovieDataset();
+      const datasetFiltered = filterMovies(dataset, { moods: [mood] });
+      const fallback = datasetFiltered.length > 0 ? datasetFiltered : dataset;
+      return fallback.slice(0, limit);
     } catch (error) {
       console.error("Error in mood-based movie filtering:", error);
-      return [];
+      const dataset = await getMovieDataset();
+      const datasetFiltered = filterMovies(dataset, { moods: [mood] });
+      const fallback = datasetFiltered.length > 0 ? datasetFiltered : dataset;
+      return fallback.slice(0, limit);
     }
   }
 

@@ -1,4 +1,11 @@
 import Movie from "../models/movieModel.js";
+import {
+  getMovieDataset,
+  filterMovies,
+  paginate,
+  getDistinctValues,
+  getTrendingFromDataset,
+} from "../utils/datasetLoader.js";
 
 // Normalize incoming query params (string, array, comma-separated) into a clean array
 const normalizeQueryValue = (value) => {
@@ -63,12 +70,31 @@ export const getMovies = async (req, res) => {
       .skip(skip);
     
     const total = await Movie.countDocuments(query);
-    
+
+    if (total === 0) {
+      const dataset = await getMovieDataset();
+      const filtered = filterMovies(dataset, {
+        genres: genreFilters,
+        moods: moodFilters,
+        search,
+      });
+      const result = paginate(filtered, limit, page);
+
+      return res.json({
+        movies: result.items,
+        page: result.page,
+        pages: result.pages,
+        total: result.total,
+        source: "dataset",
+      });
+    }
+
     res.json({
       movies,
       page: parseInt(page),
       pages: Math.ceil(total / parseInt(limit)),
-      total
+      total,
+      source: "database",
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -86,6 +112,12 @@ export const getMoviesByMood = async (req, res) => {
       .sort({ popularity: -1, rating: -1 })
       .limit(parseInt(limit));
     
+    if (movies.length === 0) {
+      const dataset = await getMovieDataset();
+      const filtered = filterMovies(dataset, { moods: [mood] });
+      return res.json(filtered.slice(0, parseInt(limit)));
+    }
+
     res.json(movies);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -98,7 +130,13 @@ export const getMoviesByMood = async (req, res) => {
 export const getAllMoods = async (req, res) => {
   try {
     const moods = await Movie.distinct("mood");
-    res.json(moods.sort());
+    if (Array.isArray(moods) && moods.length > 0) {
+      return res.json(moods.sort());
+    }
+
+    const dataset = await getMovieDataset();
+    const fallbackMoods = getDistinctValues(dataset, "mood");
+    res.json(fallbackMoods);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -110,7 +148,13 @@ export const getAllMoods = async (req, res) => {
 export const getAllGenres = async (req, res) => {
   try {
     const genres = await Movie.distinct("genre");
-    res.json(genres.sort());
+    if (Array.isArray(genres) && genres.length > 0) {
+      return res.json(genres.sort());
+    }
+
+    const dataset = await getMovieDataset();
+    const fallbackGenres = getDistinctValues(dataset, "genre");
+    res.json(fallbackGenres);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -137,12 +181,30 @@ export const getTrendingMovies = async (req, res) => {
       .skip(skip);
     
     const total = await Movie.countDocuments(query);
-    
+
+    if (total === 0) {
+      const dataset = await getMovieDataset();
+      const result = getTrendingFromDataset(dataset, {
+        years: 3,
+        limit,
+        page,
+      });
+
+      return res.json({
+        movies: result.items,
+        page: result.page,
+        pages: result.pages,
+        total: result.total,
+        source: "dataset",
+      });
+    }
+
     res.json({
       movies,
       page: parseInt(page),
       pages: Math.ceil(total / parseInt(limit)),
-      total
+      total,
+      source: "database",
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
